@@ -7,8 +7,18 @@ const swaggerSpec = require('../swagger');
 // Initialize express app
 const app = express();
 
+/**
+ * Configure CORS for development: allow React dev frontend (http://localhost:3000) and allow credentials.
+ * For production, we recommend setting a specific domain/origin.
+ */
 app.use(cors({
-  origin: '*',
+  origin: [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://vscode-internal-595-beta.beta01.cloud.kavia.ai:3000',
+    '*', // fallback, but not recommended for production
+  ],
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -43,6 +53,18 @@ app.use(express.json());
 
 // Mount routes
 app.use('/', routes);
+
+/**
+ * 404 Not Found handler.
+ * If route is not found, return proper JSON so the frontend doesn't get an opaque "Failed to fetch."
+ */
+app.use((req, res, next) => {
+  res.status(404).json({
+    status: 'error',
+    message: 'Not Found: Invalid API endpoint',
+    path: req.originalUrl,
+  });
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {

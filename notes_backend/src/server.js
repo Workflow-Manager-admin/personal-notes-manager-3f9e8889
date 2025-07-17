@@ -1,6 +1,6 @@
 const app = require('./app');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001; // React (frontend) uses 3000, backend Express should use 3001 for dev
 const HOST = process.env.HOST || '0.0.0.0';
 
 const server = app.listen(PORT, HOST, () => {
